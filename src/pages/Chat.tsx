@@ -254,7 +254,7 @@ const Chat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post<ApiResponse>('http://localhost:8000/chat', { 
+      const res = await axios.post<ApiResponse>('https://qay136g2kl.execute-api.us-east-1.amazonaws.com', { 
         content: userMessage 
       });
       
