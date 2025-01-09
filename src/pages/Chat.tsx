@@ -254,23 +254,37 @@ const Chat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post<ApiResponse>('https://qay136g2kl.execute-api.us-east-1.amazonaws.com', { 
+      const res = await axios.post('https://qay136g2kl.execute-api.us-east-1.amazonaws.com/chat', { 
         content: userMessage 
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+      
+      // Check if the response has a data property
+      const responseData = res.data.body ? JSON.parse(res.data.body) : res.data;
       
       const newMessage: Message = {
         content: 'I have analyzed your request and prepared the following documents:',
         type: 'bot',
-        artifacts: res.data.data
+        artifacts: responseData.data
       };
       
       setMessages(prev => [...prev, newMessage]);
-      setCurrentArtifacts(res.data.data);
+      setCurrentArtifacts(responseData.data);
       
     } catch (error) {
       console.error('Error sending message:', error);
+      let errorMessage = 'Sorry, there was an error processing your request.';
+      
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Response error:', error.response.data);
+        errorMessage = error.response.data.message || errorMessage;
+      }
+      
       setMessages(prev => [...prev, { 
-        content: 'Sorry, there was an error processing your request.', 
+        content: errorMessage, 
         type: 'bot' 
       }]);
     } finally {
